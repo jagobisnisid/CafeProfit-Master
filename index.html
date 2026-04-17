@@ -3,30 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CafeProfit Master | Stable Pro</title>
+    <title>CafeProfit Master | Full Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; animation: fadeIn 0.2s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .active-tab-btn { background-color: #ea580c !important; color: white !important; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .active-tab-btn { background-color: #ea580c !important; color: white !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="pb-20">
+<body class="pb-24">
 
     <header class="bg-white border-b sticky top-0 z-50 p-4">
-        <div class="max-w-4xl mx-auto flex items-center gap-2">
-            <div class="bg-orange-600 p-2 rounded-lg text-white"><i data-lucide="coffee"></i></div>
-            <h1 class="text-xl font-extrabold text-slate-800">CafeProfit Master</h1>
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="bg-orange-600 p-2 rounded-lg text-white"><i data-lucide="coffee"></i></div>
+                <h1 class="text-xl font-extrabold text-slate-800">CafeProfit Master</h1>
+            </div>
+            <div class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">STABLE MODE</div>
         </div>
     </header>
 
     <main class="max-w-4xl mx-auto p-4 space-y-4">
         
-        <div class="flex bg-white p-1 rounded-xl shadow-sm border overflow-x-auto gap-1">
+        <div class="flex bg-white p-1 rounded-xl shadow-sm border overflow-x-auto gap-1 no-scrollbar">
             <button onclick="switchTab('hpp')" id="btn-hpp" class="tab-btn flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-xs font-bold text-slate-500 active-tab-btn">
                 <i data-lucide="calculator" class="w-4 h-4"></i> HPP
             </button>
@@ -34,62 +38,55 @@
                 <i data-lucide="tag" class="w-4 h-4"></i> PROMO
             </button>
             <button onclick="switchTab('ai')" id="btn-ai" class="tab-btn flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-xs font-bold text-slate-500">
-                <i data-lucide="sparkles" class="w-4 h-4"></i> AI BIZ
+                <i data-lucide="sparkles" class="w-4 h-4"></i> AI
+            </button>
+            <button onclick="switchTab('menu')" id="btn-menu" class="tab-btn flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-xs font-bold text-slate-500">
+                <i data-lucide="book-open" class="w-4 h-4"></i> MENU
+            </button>
+            <button onclick="switchTab('db')" id="btn-db" class="tab-btn flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-xs font-bold text-slate-500">
+                <i data-lucide="database" class="w-4 h-4"></i> BAHAN
             </button>
         </div>
 
         <div id="hpp" class="tab-content active">
             <div class="bg-white rounded-2xl p-6 shadow-sm border">
-                <h2 class="text-xs font-black text-slate-400 uppercase mb-4">Kalkulator HPP Dasar</h2>
-                <div class="mb-6 bg-slate-50 p-6 rounded-2xl text-center border border-orange-100">
-                    <p class="text-xs font-bold text-slate-500 mb-1">Total HPP per Porsi</p>
-                    <p id="display-hpp" class="text-4xl font-black text-orange-600">Rp 0</p>
+                <h2 class="text-xs font-black text-slate-400 uppercase mb-4 text-center">Hitung HPP Produk</h2>
+                <div class="mb-6 bg-slate-900 p-6 rounded-2xl text-center shadow-xl">
+                    <p class="text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest">Estimasi Total HPP</p>
+                    <p id="display-hpp" class="text-4xl font-black text-orange-400">Rp 0</p>
                 </div>
-                <div class="space-y-3">
-                    <input type="text" placeholder="Nama Menu..." class="w-full p-3 border rounded-xl font-bold mb-2">
-                    <div id="ingredient-list" class="space-y-2">
-                        <div class="flex gap-2 items-center">
-                            <select class="flex-1 p-3 bg-slate-50 border rounded-xl text-sm outline-none border-slate-200">
-                                <option>Biji Kopi (Rp 150/gr)</option>
-                                <option>Susu UHT (Rp 18/ml)</option>
-                                <option>Gula Aren (Rp 45/ml)</option>
-                            </select>
-                            <input type="number" placeholder="Qty" class="w-20 p-3 border rounded-xl text-center font-bold" value="10">
-                            <button class="text-slate-300"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                <div class="space-y-4">
+                    <input type="text" id="new-menu-name" placeholder="Nama Menu Baru..." class="w-full p-4 border rounded-xl font-bold bg-slate-50 outline-none focus:ring-2 focus:ring-orange-500">
+                    <div id="ingredient-list" class="space-y-3">
                         </div>
-                    </div>
-                    <button class="w-full py-3 border-2 border-dashed rounded-xl text-slate-400 font-bold mt-2">+ Tambah Bahan</button>
+                    <button onclick="addIngredientRow()" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 font-bold hover:bg-slate-50">+ Tambah Bahan</button>
+                    <button onclick="saveMenu()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold mt-4 shadow-lg active:scale-95 transition-transform">SIMPAN KE MENU</button>
                 </div>
             </div>
         </div>
 
         <div id="promo" class="tab-content">
             <div class="space-y-4">
-                <div class="grid grid-cols-4 gap-2">
-                    <button onclick="setPromo('diskon')" class="promo-mode p-3 bg-white border rounded-xl text-center font-bold text-[10px] border-orange-500 text-orange-600">DISKON</button>
-                    <button onclick="setPromo('bundling')" class="promo-mode p-3 bg-white border rounded-xl text-center font-bold text-[10px]">BUNDLING</button>
-                    <button onclick="setPromo('bogo')" class="promo-mode p-3 bg-white border rounded-xl text-center font-bold text-[10px]">BOGO</button>
-                    <button onclick="setPromo('tebus')" class="promo-mode p-3 bg-white border rounded-xl text-center font-bold text-[10px]">TEBUS</button>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <button onclick="setPromo('diskon')" class="promo-mode p-3 bg-white border rounded-xl font-bold text-[10px] border-orange-500 text-orange-600 uppercase">Diskon %</button>
+                    <button onclick="setPromo('bundling')" class="promo-mode p-3 bg-white border rounded-xl font-bold text-[10px] uppercase">Bundling</button>
+                    <button onclick="setPromo('bogo')" class="promo-mode p-3 bg-white border rounded-xl font-bold text-[10px] uppercase">Buy 1 Get 1</button>
+                    <button onclick="setPromo('tebus')" class="promo-mode p-3 bg-white border rounded-xl font-bold text-[10px] uppercase">Tebus Murah</button>
                 </div>
-
                 <div class="bg-white p-6 rounded-2xl border shadow-sm">
                     <h3 id="promo-title" class="font-black text-slate-800 mb-4">Kalkulator Diskon</h3>
                     <div class="space-y-4">
                         <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">Harga Jual Normal (Rp)</label>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Harga Normal (Rp)</label>
                             <input type="number" id="promo-price" value="20000" class="w-full p-3 bg-slate-50 border rounded-xl font-bold" oninput="calculatePromo()">
                         </div>
                         <div>
-                            <label id="promo-label" class="text-[10px] font-bold text-slate-400 uppercase">Besar Diskon (%)</label>
+                            <label id="promo-label" class="text-[10px] font-bold text-slate-400 uppercase">Persentase Diskon (%)</label>
                             <input type="number" id="promo-value" value="10" class="w-full p-3 bg-slate-50 border rounded-xl font-bold" oninput="calculatePromo()">
                         </div>
-                        <div class="p-5 bg-slate-900 rounded-2xl text-white mt-6">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="text-[10px] text-slate-400 font-bold uppercase">Harga Setelah Promo</p>
-                                    <p id="promo-result" class="text-2xl font-black text-orange-400">Rp 18.000</p>
-                                </div>
-                            </div>
+                        <div class="p-5 bg-orange-600 rounded-2xl text-white mt-6 shadow-lg">
+                            <p class="text-[10px] font-bold uppercase opacity-80">Harga Setelah Promo</p>
+                            <p id="promo-result" class="text-3xl font-black">Rp 18.000</p>
                         </div>
                     </div>
                 </div>
@@ -99,105 +96,199 @@
         <div id="ai" class="tab-content">
             <div class="space-y-4">
                 <div class="bg-white p-6 rounded-2xl border shadow-sm">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i data-lucide="chef-hat" class="text-orange-600"></i>
-                        <h4 class="font-black text-slate-800">Recipe Generator</h4>
-                    </div>
-                    <p class="text-xs text-slate-500 mb-4">Buat resep unik dari bahan sisa/stok yang ada.</p>
-                    <input type="text" id="recipe-input" placeholder="Contoh: Matcha dan Selai Kacang" class="w-full p-3 border rounded-xl text-sm mb-3 outline-none focus:ring-2 focus:ring-orange-500">
-                    <button onclick="runAI('recipe')" id="btn-recipe" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Generate Resep AI</button>
+                    <h4 class="font-black text-slate-800 flex items-center gap-2"><i data-lucide="chef-hat" class="text-orange-600"></i> Recipe Generator</h4>
+                    <p class="text-xs text-slate-500 mt-1 mb-4">Input bahan stok sisa untuk ide menu baru.</p>
+                    <input type="text" id="recipe-input" placeholder="Contoh: Pisang dan Keju" class="w-full p-3 border rounded-xl text-sm mb-3">
+                    <button onclick="runAI('recipe')" id="btn-recipe" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Analisa Resep AI</button>
                 </div>
-
                 <div class="bg-white p-6 rounded-2xl border shadow-sm">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i data-lucide="trending-up" class="text-blue-600"></i>
-                        <h4 class="font-black text-slate-800">Promo Advisor</h4>
-                    </div>
-                    <p class="text-xs text-slate-500 mb-4">Saran strategi marketing berdasarkan tren cafe 2024.</p>
+                    <h4 class="font-black text-slate-800 flex items-center gap-2"><i data-lucide="trending-up" class="text-blue-600"></i> Promo Advisor</h4>
+                    <p class="text-xs text-slate-500 mt-1 mb-4">Strategi promo berdasarkan data menu Anda.</p>
                     <button onclick="runAI('advisor')" id="btn-advisor" class="w-full border-2 border-blue-600 text-blue-600 py-3 rounded-xl font-bold text-sm">Cek Ide Promo</button>
                 </div>
-
-                <div id="ai-response" class="hidden bg-slate-900 text-white rounded-2xl p-6 border-l-4 border-orange-500 animate-fade">
-                    <p id="ai-text" class="text-sm leading-relaxed whitespace-pre-wrap"></p>
+                <div id="ai-response" class="hidden bg-slate-900 text-white rounded-2xl p-6 border-l-4 border-orange-500">
+                    <p id="ai-text" class="text-sm leading-relaxed whitespace-pre-wrap font-medium"></p>
                 </div>
+            </div>
+        </div>
+
+        <div id="menu" class="tab-content">
+            <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b flex justify-between items-center">
+                    <span class="text-xs font-black text-slate-400 uppercase">Daftar Menu Inventory</span>
+                    <span id="menu-count" class="bg-orange-100 text-orange-600 text-[10px] px-2 py-1 rounded-full font-bold">0 Items</span>
+                </div>
+                <div id="menu-list" class="divide-y divide-slate-100">
+                    </div>
+            </div>
+        </div>
+
+        <div id="db" class="tab-content">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-sm font-black text-slate-800 uppercase">Database Harga Bahan</h2>
+                    <button onclick="addDbRow()" class="bg-orange-600 text-white text-[10px] px-3 py-2 rounded-lg font-bold">+ TAMBAH</button>
+                </div>
+                <div id="db-list" class="space-y-3">
+                    </div>
             </div>
         </div>
 
     </main>
 
     <script>
-        // Tab System
+        // Data Global
+        let ingredientsDb = [
+            { name: 'Biji Kopi Blend', price: 150000, capacity: 1000 },
+            { name: 'Susu UHT', price: 18000, capacity: 1000 },
+            { name: 'Gula Aren Cair', price: 45000, capacity: 1000 }
+        ];
+        let menuItems = [
+            { name: 'Es Kopi Susu Aren', hpp: 8500 }
+        ];
+
+        // System: Switch Tab
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active-tab-btn'));
-            
             document.getElementById(tabId).classList.add('active');
             document.getElementById('btn-' + tabId).classList.add('active-tab-btn');
+            
+            if(tabId === 'menu') renderMenu();
+            if(tabId === 'db') renderDb();
+            if(tabId === 'hpp') renderHppRows();
             lucide.createIcons();
         }
 
-        // Promo Logic
-        let currentMode = 'diskon';
-        function setPromo(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.promo-mode').forEach(btn => btn.classList.remove('border-orange-500', 'text-orange-600'));
-            event.target.classList.add('border-orange-500', 'text-orange-600');
-            
-            const title = document.getElementById('promo-title');
-            const label = document.getElementById('promo-label');
-            
-            if(mode === 'diskon') {
-                title.innerText = 'Kalkulator Diskon';
-                label.innerText = 'Besar Diskon (%)';
-            } else if(mode === 'bundling') {
-                title.innerText = 'Kalkulator Bundling (2 Menu)';
-                label.innerText = 'Harga Paket (Rp)';
-            } else if(mode === 'bogo') {
-                title.innerText = 'Kalkulator Buy 1 Get 1';
-                label.innerText = 'Potongan Tambahan (Rp)';
-            } else if(mode === 'tebus') {
-                title.innerText = 'Kalkulator Tebus Murah';
-                label.innerText = 'Harga Tebus (Rp)';
-            }
-            calculatePromo();
+        // Feature: HPP
+        let hppRows = [{ dbIdx: 0, qty: 10 }];
+        function addIngredientRow() {
+            hppRows.push({ dbIdx: 0, qty: 0 });
+            renderHppRows();
+        }
+        function deleteHppRow(idx) {
+            hppRows.splice(idx, 1);
+            renderHppRows();
+        }
+        function renderHppRows() {
+            const container = document.getElementById('ingredient-list');
+            container.innerHTML = hppRows.map((row, i) => `
+                <div class="flex gap-2 items-center">
+                    <select onchange="updateHppData(${i}, 'dbIdx', this.value)" class="flex-1 p-3 bg-slate-50 border rounded-xl text-xs font-bold">
+                        ${ingredientsDb.map((db, dbI) => `<option value="${dbI}" ${row.dbIdx == dbI ? 'selected' : ''}>${db.name}</option>`).join('')}
+                    </select>
+                    <input type="number" value="${row.qty}" oninput="updateHppData(${i}, 'qty', this.value)" class="w-20 p-3 border rounded-xl text-center font-bold text-xs">
+                    <button onclick="deleteHppRow(${i})" class="text-slate-300 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+            `).join('');
+            calculateHppTotal();
+            lucide.createIcons();
+        }
+        function updateHppData(idx, key, val) {
+            hppRows[idx][key] = val;
+            calculateHppTotal();
+        }
+        function calculateHppTotal() {
+            let total = 0;
+            hppRows.forEach(row => {
+                const db = ingredientsDb[row.dbIdx];
+                if(db) total += (db.price / db.capacity) * row.qty;
+            });
+            document.getElementById('display-hpp').innerText = 'Rp ' + Math.round(total).toLocaleString('id-ID');
+            return total;
+        }
+        function saveMenu() {
+            const name = document.getElementById('new-menu-name').value;
+            if(!name) return alert('Isi nama menu dulu bos!');
+            menuItems.push({ name: name, hpp: calculateHppTotal() });
+            alert('Menu berhasil disimpan!');
+            document.getElementById('new-menu-name').value = '';
+            switchTab('menu');
         }
 
+        // Feature: Promo
+        let currentPromoMode = 'diskon';
+        function setPromo(mode) {
+            currentPromoMode = mode;
+            document.querySelectorAll('.promo-mode').forEach(b => b.classList.remove('border-orange-500', 'text-orange-600'));
+            event.target.classList.add('border-orange-500', 'text-orange-600');
+            const labels = { diskon: 'Persentase Diskon (%)', bundling: 'Harga Paket (Rp)', bogo: 'Potongan Extra (Rp)', tebus: 'Harga Tebus (Rp)' };
+            document.getElementById('promo-label').innerText = labels[mode];
+            document.getElementById('promo-title').innerText = 'Kalkulator ' + mode.toUpperCase();
+            calculatePromo();
+        }
         function calculatePromo() {
             const price = parseFloat(document.getElementById('promo-price').value) || 0;
             const val = parseFloat(document.getElementById('promo-value').value) || 0;
-            let result = 0;
-
-            if(currentMode === 'diskon') result = price - (price * (val/100));
-            else if(currentMode === 'bundling' || currentMode === 'tebus') result = val;
-            else if(currentMode === 'bogo') result = price - val;
-
-            document.getElementById('promo-result').innerText = 'Rp ' + result.toLocaleString('id-ID');
+            let res = 0;
+            if(currentPromoMode === 'diskon') res = price - (price * (val/100));
+            else if(currentPromoMode === 'bogo') res = price - val;
+            else res = val;
+            document.getElementById('promo-result').innerText = 'Rp ' + Math.round(res).toLocaleString('id-ID');
         }
 
-        // AI Simulation
+        // Feature: AI
         function runAI(type) {
             const btn = type === 'recipe' ? document.getElementById('btn-recipe') : document.getElementById('btn-advisor');
-            const responseDiv = document.getElementById('ai-response');
-            const responseText = document.getElementById('ai-text');
-            const input = document.getElementById('recipe-input').value;
-
-            btn.innerText = 'Menganalisa...';
-            btn.disabled = true;
-
+            const resDiv = document.getElementById('ai-response');
+            const resTxt = document.getElementById('ai-text');
+            btn.innerText = 'Tunggu...';
             setTimeout(() => {
-                responseDiv.classList.remove('hidden');
+                resDiv.classList.remove('hidden');
                 if(type === 'recipe') {
-                    responseText.innerText = `💡 IDE RESEP: ${input || 'Signature Coffee'}\n\n1. Campurkan bahan dasar dengan rasio 1:2.\n2. Tambahkan topping foam untuk meningkatkan visual.\n3. Saran Harga: Rp 25.000 - Rp 32.000.\n4. Estimasi Margin: 65%.`;
+                    const inp = document.getElementById('recipe-input').value || 'Bahan Pilihan';
+                    resTxt.innerText = `💡 IDE RESEP AI: ${inp}\n\n1. Analisis: Bahan ini cocok untuk menu Seasonal.\n2. Langkah: Campur dengan susu oat untuk tekstur mewah.\n3. Harga Jual: Disarankan Rp 35.000.\n4. Margin: Target Profit 70%.`;
                 } else {
-                    responseText.innerText = `📈 STRATEGI PROMO:\n\n1. Paket Sarapan: Kopi + Roti (Hemat 20%).\n2. Loyalty: Beli 5 Gratis 1 setiap hari kerja.\n3. Jam Ajaib: Diskon 15% di jam 14:00 - 16:00.`;
+                    resTxt.innerText = `📈 STRATEGI PROMO AI\n\n1. Paket Combo: Gabungkan menu HPP terendah dengan Best Seller.\n2. Event: Adakan 'Payday Flash Sale' di akhir bulan.\n3. Rekomendasi: Gunakan skema BOGO untuk stok biji kopi yang hampir expired.`;
                 }
-                btn.innerText = type === 'recipe' ? 'Generate Resep AI' : 'Cek Ide Promo';
-                btn.disabled = false;
-            }, 1000);
+                btn.innerText = (type === 'recipe' ? 'Analisa Resep AI' : 'Cek Ide Promo');
+            }, 800);
+        }
+
+        // Feature: Menu List
+        function renderMenu() {
+            const container = document.getElementById('menu-list');
+            document.getElementById('menu-count').innerText = menuItems.length + ' Items';
+            container.innerHTML = menuItems.map((item, i) => `
+                <div class="p-4 flex justify-between items-center bg-white hover:bg-slate-50">
+                    <div>
+                        <p class="font-bold text-slate-800">${item.name}</p>
+                        <p class="text-[10px] font-bold text-orange-600 uppercase">HPP: Rp ${item.hpp.toLocaleString('id-ID')}</p>
+                    </div>
+                    <button onclick="deleteMenu(${i})" class="text-slate-200 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+        function deleteMenu(i) {
+            menuItems.splice(i, 1);
+            renderMenu();
+        }
+
+        // Feature: Database
+        function renderDb() {
+            const container = document.getElementById('db-list');
+            container.innerHTML = ingredientsDb.map((item, i) => `
+                <div class="grid grid-cols-12 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100 items-center">
+                    <input class="col-span-6 bg-transparent font-bold text-xs" value="${item.name}" oninput="ingredientsDb[${i}].name = this.value">
+                    <input type="number" class="col-span-5 bg-white border rounded p-1 font-bold text-xs text-right text-orange-600" value="${item.price}" oninput="ingredientsDb[${i}].price = this.value">
+                    <button onclick="deleteDb(${i})" class="col-span-1 text-slate-300 flex justify-end"><i data-lucide="x" class="w-4 h-4"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+        function addDbRow() {
+            ingredientsDb.push({ name: 'Bahan Baru', price: 0, capacity: 1000 });
+            renderDb();
+        }
+        function deleteDb(i) {
+            ingredientsDb.splice(i, 1);
+            renderDb();
         }
 
         // Init
         window.onload = () => {
+            renderHppRows();
             lucide.createIcons();
         };
     </script>
