@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CafeProfit Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800">
+    <div class="max-w-md mx-auto min-h-screen flex flex-col">
+        <header class="bg-orange-600 p-6 text-white text-center shadow-lg">
+            <h1 class="text-2xl font-black italic">CafeProfit Master ☕</h1>
+            <p class="text-xs opacity-80 font-bold uppercase tracking-widest mt-1">Kalkulator HPP Simpel</p>
+        </header>
+
+        <main class="p-4 flex-grow">
+            <div class="bg-white rounded-3xl p-6 shadow-xl border border-slate-200">
+                <div class="mb-5">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Nama Produk</label>
+                    <input type="text" id="name" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 outline-none transition-all font-bold" placeholder="Misal: Es Kopi Susu">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Total Biaya Bahan (Rp)</label>
+                    <input type="number" id="cost" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-orange-500 outline-none transition-all font-bold text-2xl text-orange-600" placeholder="0">
+                </div>
+
+                <button onclick="tambahMenu()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black shadow-lg active:scale-95 transition-transform uppercase tracking-wider">
+                    Simpan Menu
+                </button>
+            </div>
+
+            <div id="list" class="mt-8 space-y-3">
+                </div>
+        </main>
+    </div>
+
+    <script>
+        let dataMenu = [];
+
+        function tambahMenu() {
+            const nama = document.getElementById('name').value;
+            const harga = document.getElementById('cost').value;
+
+            if(!nama || !harga) return alert('Isi dulu bosku!');
+
+            const baru = { id: Date.now(), nama, harga: parseInt(harga) };
+            dataMenu.push(baru);
+            
+            // Reset input
+            document.getElementById('name').value = '';
+            document.getElementById('cost').value = '';
+            
+            tampilkan();
+        }
+
+        function tampilkan() {
+            const kontainer = document.getElementById('list');
+            kontainer.innerHTML = '<h2 class="font-black text-slate-400 text-xs uppercase mb-3">Menu Tersimpan</h2>';
+            
+            dataMenu.reverse().forEach(m => {
+                kontainer.innerHTML += `
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-orange-500 flex justify-between items-center animate-bounce-in">
+                        <div>
+                            <p class="font-black text-slate-800">${m.nama}</p>
+                            <p class="text-orange-600 font-bold">Rp ${m.harga.toLocaleString('id-ID')}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
