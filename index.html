@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CafeProfit Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 15px; }
+        .btn-primary { background: #ea580c; color: white; width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div id="app" class="max-w-md mx-auto min-h-screen">
+        <header class="bg-orange-600 p-5 text-white text-center shadow-lg">
+            <h1 class="text-xl font-bold">☕ CafeProfit Master</h1>
+        </header>
+
+        <div class="p-4">
+            <div class="card shadow-sm">
+                <h2 class="font-bold mb-3 text-orange-600">Kalkulator HPP</h2>
+                <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Nama Menu</label>
+                <input type="text" id="menuName" class="w-full p-3 border rounded-lg mb-4 bg-gray-50" placeholder="Contoh: Es Kopi Susu">
+                
+                <label class="block text-xs font-bold text-gray-400 mb-1 uppercase">Harga Bahan Total (Rp)</label>
+                <input type="number" id="totalCost" class="w-full p-3 border rounded-lg mb-4 bg-gray-50" placeholder="Masukkan total biaya bahan">
+                
+                <button onclick="saveMenu()" class="btn-primary">SIMPAN KE DAFTAR</button>
+            </div>
+
+            <div id="menuList">
+                <h3 class="font-bold mb-3 text-gray-500 uppercase text-xs">Daftar Menu Tersimpan</h3>
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // Data sederhana tanpa React agar PASTI JALAN
+        let menus = [];
+
+        function saveMenu() {
+            const name = document.getElementById('menuName').value;
+            const cost = document.getElementById('totalCost').value;
+
+            if (name === "" || cost === "") {
+                alert("Isi nama dan harganya dulu ya!");
+                return;
+            }
+
+            const item = {
+                id: Date.now(),
+                name: name,
+                cost: parseInt(cost)
+            };
+
+            menus.push(item);
+            renderMenu();
+
+            // Reset Input
+            document.getElementById('menuName').value = "";
+            document.getElementById('totalCost').value = "";
+        }
+
+        function renderMenu() {
+            const list = document.getElementById('menuList');
+            let html = '<h3 class="font-bold mb-3 text-gray-500 uppercase text-xs">Daftar Menu Tersimpan</h3>';
+            
+            if (menus.length === 0) {
+                html += '<p class="text-gray-400 text-center text-sm">Belum ada menu.</p>';
+            }
+
+            menus.forEach(m => {
+                html += `
+                    <div class="card shadow-sm border-l-4 border-orange-500">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-bold text-gray-800">${m.name}</p>
+                                <p class="text-orange-600 font-bold">Rp ${m.cost.toLocaleString('id-ID')}</p>
+                            </div>
+                            <button onclick="deleteMenu(${m.id})" class="text-red-400 text-xs font-bold">Hapus</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            list.innerHTML = html;
+        }
+
+        function deleteMenu(id) {
+            menus = menus.filter(m => m.id !== id);
+            renderMenu();
+        }
+
+        // Jalankan saat pertama kali buka
+        renderMenu();
+    </script>
+</body>
+</html>
