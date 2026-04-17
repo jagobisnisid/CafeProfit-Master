@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,12 +9,15 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
 <body class="bg-slate-50">
     <div id="root"></div>
 
     <script type="text/babel">
-        // Masukkan Ikon Lucide ke React
+        // Inisialisasi Ikon Lucide untuk React
         const { 
           Calculator, Tag, BookOpen, Sparkles, Plus, Trash2, Percent, 
           Package, Gift, ShoppingCart, ChefHat, TrendingUp, AlertCircle, 
@@ -24,67 +27,33 @@
 
         const { useState, useEffect, useMemo } = React;
 
-        // --- KODE KAMU DIMULAI DI SINI ---
-        const apiKey = ""; // Isi API Key kamu di sini jika ada
-        const GEN_MODEL = "gemini-2.5-flash-preview-09-2025";
-
         const App = () => {
-            // (Semua kode yang kamu berikan tadi saya masukkan ke sini)
             const [activeTab, setActiveTab] = useState('hpp');
-            const [showBulkModal, setShowBulkModal] = useState(false);
-            const [bulkInputText, setBulkInputText] = useState('');
             const [editingId, setEditingId] = useState(null);
             
+            // Database Bahan
             const [ingredientDb, setIngredientDb] = useState([
                 { id: 1, name: 'Biji Kopi House Blend', price: 150000, capacity: 1000, unit: 'gr' },
                 { id: 2, name: 'Susu UHT', price: 18000, capacity: 1000, unit: 'ml' },
                 { id: 3, name: 'Gula Aren Cair', price: 45000, capacity: 1000, unit: 'ml' },
             ]);
 
+            // Menu List
             const [menuItems, setMenuItems] = useState([
                 { id: 1, name: 'Es Kopi Susu Gula Aren', hpp: 8500, price: 18000 },
-                { id: 2, name: 'Croissant Butter', hpp: 12000, price: 25000 },
             ]);
 
+            // Calculator State
             const [ingredients, setIngredients] = useState([{ dbId: '', usage: '' }]);
             const [hppName, setHppName] = useState('');
 
-            const [promoType, setPromoType] = useState('discount');
-            const [promoData, setPromoData] = useState({
-                itemId: '',
-                discountPercent: 10,
-                bundlingItems: [],
-                bundlePrice: 0,
-                tebusMurahPrice: 5000
-            });
+            const formatIDR = (val) => new Intl.NumberFormat('id-ID', { 
+                style: 'currency', 
+                currency: 'IDR', 
+                maximumFractionDigits: 0 
+            }).format(val);
 
-            const [aiLoading, setAiLoading] = useState(false);
-            const [aiResult, setAiResult] = useState(null);
-            const [recipeInput, setRecipeInput] = useState('');
-
-            const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
-
-            // Logika Fungsi
-            const addDbItem = () => {
-                const newId = Date.now();
-                setIngredientDb([...ingredientDb, { id: newId, name: '', price: 0, capacity: 1000, unit: 'gr' }]);
-                setEditingId(newId);
-            };
-
-            const updateDbItem = (id, field, value) => {
-                setIngredientDb(ingredientDb.map(item => item.id === id ? { ...item, [field]: value } : item));
-            };
-
-            const removeDbItem = (id) => setIngredientDb(ingredientDb.filter(item => item.id !== id));
-
-            const addIngredientRow = () => setIngredients([...ingredients, { dbId: '', usage: '' }]);
-            const updateIngredientRow = (index, field, value) => {
-                const newIng = [...ingredients];
-                newIng[index][field] = value;
-                setIngredients(newIng);
-            };
-            const removeIngredientRow = (index) => setIngredients(ingredients.filter((_, i) => i !== index));
-
+            // Logika HPP
             const totalHPP = useMemo(() => {
                 return ingredients.reduce((sum, row) => {
                     const base = ingredientDb.find(db => db.id == row.dbId);
@@ -95,118 +64,132 @@
                 }, 0);
             }, [ingredients, ingredientDb]);
 
+            const addIngredientRow = () => setIngredients([...ingredients, { dbId: '', usage: '' }]);
+            
+            const updateIngredientRow = (index, field, value) => {
+                const newIng = [...ingredients];
+                newIng[index][field] = value;
+                setIngredients(newIng);
+            };
+
             const saveToMenu = () => {
-                if (!hppName) return;
-                setMenuItems([...menuItems, { id: Date.now(), name: hppName, hpp: totalHPP, price: Math.ceil((totalHPP * 3) / 1000) * 1000 }]);
+                if (!hppName || totalHPP === 0) return;
+                setMenuItems([...menuItems, { 
+                    id: Date.now(), 
+                    name: hppName, 
+                    hpp: totalHPP, 
+                    price: Math.ceil((totalHPP * 3) / 1000) * 1000 
+                }]);
                 setHppName('');
                 setIngredients([{ dbId: '', usage: '' }]);
                 setActiveTab('menu');
             };
 
-            // Rendering UI (Bagian Return)
             return (
-                <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20">
-                    <header className="bg-white border-b sticky top-0 z-10">
-                        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <div className="bg-orange-600 p-2 rounded-lg text-white">
-                                    <Calculator size={24} />
-                                </div>
-                                <h1 className="text-xl font-bold tracking-tight text-slate-800">CafeProfit Master</h1>
+                <div className="min-h-screen pb-20">
+                    <header className="bg-white border-b p-4 sticky top-0 z-10 shadow-sm">
+                        <div className="max-w-4xl mx-auto flex items-center gap-3">
+                            <div className="bg-orange-600 p-2 rounded-lg text-white">
+                                <Calculator size={24} />
                             </div>
+                            <h1 className="text-xl font-bold text-slate-800">CafeProfit Master</h1>
                         </div>
                     </header>
 
                     <main className="max-w-4xl mx-auto p-4 space-y-6">
-                        {/* Tab Nav */}
+                        {/* Navigasi */}
                         <div className="flex bg-white p-1 rounded-xl shadow-sm border overflow-x-auto">
-                            {[
-                                { id: 'hpp', icon: Calculator, label: 'Kalkulator HPP' },
-                                { id: 'menu', icon: BookOpen, label: 'Menu' },
-                                { id: 'db', icon: Database, label: 'Database' },
-                            ].map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all flex-1 justify-center ${
-                                        activeTab === tab.id ? 'bg-orange-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'
-                                    }`}
-                                >
-                                    <tab.icon size={16} /> {tab.label}
-                                </button>
-                            ))}
+                            <button onClick={() => setActiveTab('hpp')} className={`flex-1 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 ${activeTab === 'hpp' ? 'bg-orange-600 text-white' : 'text-slate-600'}`}>
+                                <Calculator size={16} /> HPP
+                            </button>
+                            <button onClick={() => setActiveTab('menu')} className={`flex-1 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 ${activeTab === 'menu' ? 'bg-orange-600 text-white' : 'text-slate-600'}`}>
+                                <BookOpen size={16} /> Menu
+                            </button>
+                            <button onClick={() => setActiveTab('db')} className={`flex-1 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 ${activeTab === 'db' ? 'bg-orange-600 text-white' : 'text-slate-600'}`}>
+                                <Database size={16} /> Database
+                            </button>
                         </div>
 
-                        {/* Tampilan HPP */}
                         {activeTab === 'hpp' && (
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border">
+                            <div className="bg-white rounded-2xl p-6 shadow-md border animate-in fade-in">
                                 <h2 className="text-lg font-bold mb-4">Kalkulator HPP</h2>
                                 <input 
-                                    className="w-full p-4 bg-slate-50 border rounded-xl mb-4 font-bold" 
-                                    placeholder="Nama Menu" 
+                                    className="w-full p-4 bg-slate-50 border rounded-xl mb-6 font-bold outline-none focus:ring-2 focus:ring-orange-500" 
+                                    placeholder="Nama Menu Baru..." 
                                     value={hppName} 
                                     onChange={(e) => setHppName(e.target.value)}
                                 />
-                                {ingredients.map((row, idx) => (
-                                    <div key={idx} className="flex gap-2 mb-2">
-                                        <select 
-                                            className="flex-1 p-2 border rounded-lg"
-                                            value={row.dbId}
-                                            onChange={(e) => updateIngredientRow(idx, 'dbId', e.target.value)}
-                                        >
-                                            <option value="">Pilih Bahan</option>
-                                            {ingredientDb.map(db => <option key={db.id} value={db.id}>{db.name}</option>)}
-                                        </select>
-                                        <input 
-                                            type="number" 
-                                            className="w-20 p-2 border rounded-lg" 
-                                            placeholder="Qty"
-                                            value={row.usage}
-                                            onChange={(e) => updateIngredientRow(idx, 'usage', e.target.value)}
-                                        />
-                                        <button onClick={() => removeIngredientRow(idx)} className="text-red-500">
-                                            <Trash2 size={20} />
-                                        </button>
-                                    </div>
-                                ))}
-                                <button onClick={addIngredientRow} className="w-full py-2 border-2 border-dashed rounded-xl text-slate-400">+ Tambah Bahan</button>
-                                <div className="mt-6 p-4 bg-orange-50 rounded-xl text-center">
-                                    <p className="text-sm uppercase font-bold text-orange-600">Total HPP</p>
-                                    <p className="text-3xl font-black">{formatIDR(totalHPP)}</p>
+                                <div className="space-y-3">
+                                    {ingredients.map((row, idx) => (
+                                        <div key={idx} className="flex gap-2">
+                                            <select 
+                                                className="flex-1 p-3 border rounded-xl bg-white"
+                                                value={row.dbId}
+                                                onChange={(e) => updateIngredientRow(idx, 'dbId', e.target.value)}
+                                            >
+                                                <option value="">Pilih Bahan</option>
+                                                {ingredientDb.map(db => <option key={db.id} value={db.id}>{db.name}</option>)}
+                                            </select>
+                                            <input 
+                                                type="number" 
+                                                className="w-24 p-3 border rounded-xl" 
+                                                placeholder="Qty"
+                                                value={row.usage}
+                                                onChange={(e) => updateIngredientRow(idx, 'usage', e.target.value)}
+                                            />
+                                            <button onClick={() => setIngredients(ingredients.filter((_, i) => i !== idx))} className="text-red-400 p-2">
+                                                <Trash2 size={20} />
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
-                                <button onClick={saveToMenu} className="w-full bg-slate-900 text-white py-4 rounded-xl mt-4 font-bold">Simpan ke Menu</button>
+                                <button onClick={addIngredientRow} className="w-full py-3 border-2 border-dashed rounded-xl text-slate-400 mt-4 hover:bg-slate-50 transition-all">+ Tambah Komponen</button>
+                                
+                                <div className="mt-8 p-6 bg-orange-600 rounded-2xl text-white text-center shadow-lg shadow-orange-100">
+                                    <p className="text-xs uppercase font-black opacity-80">Estimasi HPP Per Porsi</p>
+                                    <p className="text-4xl font-black">{formatIDR(totalHPP)}</p>
+                                </div>
+
+                                <button 
+                                    onClick={saveToMenu}
+                                    disabled={!hppName || totalHPP === 0}
+                                    className="w-full bg-slate-900 text-white py-4 rounded-xl mt-6 font-bold disabled:opacity-30 flex items-center justify-center gap-2"
+                                >
+                                    <Save size={18} /> Simpan ke Daftar Menu
+                                </button>
                             </div>
                         )}
 
-                        {/* Tab Menu */}
                         {activeTab === 'menu' && (
                             <div className="bg-white rounded-2xl shadow-sm border divide-y">
+                                <div className="p-4 bg-slate-50 font-bold text-slate-700">Daftar Jual Menu</div>
                                 {menuItems.map(item => (
-                                    <div key={item.id} className="p-4 flex justify-between items-center">
+                                    <div key={item.id} className="p-5 flex justify-between items-center hover:bg-orange-50/30 transition-all">
                                         <div>
-                                            <p className="font-bold text-lg">{item.name}</p>
-                                            <p className="text-sm text-slate-500">HPP: {formatIDR(item.hpp)} | Jual: {formatIDR(item.price)}</p>
+                                            <p className="font-black text-slate-800 text-lg">{item.name}</p>
+                                            <p className="text-sm text-slate-500 font-medium">HPP: {formatIDR(item.hpp)} | Jual: {formatIDR(item.price)}</p>
                                         </div>
-                                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Untung!</span>
+                                        <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-black uppercase">Profit OK</div>
                                     </div>
                                 ))}
                             </div>
                         )}
 
-                        {/* Tab Database */}
                         {activeTab === 'db' && (
                             <div className="bg-white rounded-2xl p-6 shadow-sm border">
-                                <div className="flex justify-between mb-4">
-                                    <h2 className="font-bold">Database Bahan</h2>
-                                    <button onClick={addDbItem} className="bg-orange-600 text-white px-3 py-1 rounded-lg text-sm">+ Bahan</button>
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="font-bold text-slate-800">Database Harga Bahan</h2>
+                                    <button onClick={() => setIngredientDb([...ingredientDb, { id: Date.now(), name: '', price: 0, capacity: 1000, unit: 'gr' }])} className="bg-orange-600 text-white px-4 py-2 rounded-xl text-sm font-bold">+ Bahan</button>
                                 </div>
-                                {ingredientDb.map(item => (
-                                    <div key={item.id} className="grid grid-cols-3 gap-2 mb-2">
-                                        <input className="p-2 border rounded" value={item.name} onChange={(e) => updateDbItem(item.id, 'name', e.target.value)} />
-                                        <input type="number" className="p-2 border rounded" value={item.price} onChange={(e) => updateDbItem(item.id, 'price', e.target.value)} />
-                                        <button onClick={() => removeDbItem(item.id)} className="text-red-400">Hapus</button>
-                                    </div>
-                                ))}
+                                <div className="space-y-3">
+                                    {ingredientDb.map(item => (
+                                        <div key={item.id} className="grid grid-cols-12 gap-2 items-center">
+                                            <input className="col-span-6 p-2 border rounded-lg" placeholder="Nama Bahan" value={item.name} onChange={(e) => setIngredientDb(ingredientDb.map(i => i.id === item.id ? {...i, name: e.target.value} : i))} />
+                                            <input type="number" className="col-span-4 p-2 border rounded-lg" placeholder="Harga" value={item.price} onChange={(e) => setIngredientDb(ingredientDb.map(i => i.id === item.id ? {...i, price: e.target.value} : i))} />
+                                            <button onClick={() => setIngredientDb(ingredientDb.filter(i => i.id !== item.id))} className="col-span-2 text-red-400 flex justify-center"><Trash2 size={18}/></button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </main>
@@ -214,7 +197,6 @@
             );
         };
 
-        // Render aplikasi ke dalam div root
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
