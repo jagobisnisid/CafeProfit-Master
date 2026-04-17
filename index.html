@@ -3,227 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CafeProfit Master | Pro Suite</title>
+    <title>CafeProfit Master | Stable Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .animate-fade { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .active-tab-btn { background-color: #ea580c !important; color: white !important; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="pb-20">
 
-    <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+    <header class="bg-white border-b sticky top-0 z-50 p-4">
+        <div class="max-w-4xl mx-auto flex items-center gap-2">
+            <div class="bg-orange-600 p-2 rounded-lg text-white"><i data-lucide="coffee"></i></div>
+            <h1 class="text-xl font-extrabold text-slate-800">CafeProfit Master</h1>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 space-y-4">
         
-        // Komponen Icon Sederhana
-        const Icon = ({ name, size = 20, className = "" }) => {
-            useEffect(() => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
+        <div class="flex bg-white p-1 rounded-xl shadow-sm border overflow-x-auto gap-1">
+            <button onclick="switchTab('hpp')" id="btn-hpp" class="tab-btn flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-xs font-bold text-slate-500 active-tab-btn">
+                <i data-lucide="calculator" class="w-4 h-4"></i> HPP
+            </button>
+            <button onclick="switchTab('promo')" id="btn-promo" class="tab-btn flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-xs font-bold text-slate-500">
+                <i data-lucide="tag" class="w-4 h-4"></i> PROMO
+            </button>
+            <button onclick="switchTab('ai')" id="btn-ai" class="tab-btn flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-xs font-bold text-slate-500">
+                <i data-lucide="sparkles" class="w-4 h-4"></i> AI BIZ
+            </button>
+        </div>
+
+        <div id="hpp" class="tab-content active">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border">
+                <h2 class="text-xs font-black text-slate-400 uppercase mb-4">Kalkulator HPP Dasar</h2>
+                <div class="mb-6 bg-slate-50 p-6 rounded-2xl text-center border border-orange-100">
+                    <p class="text-xs font-bold text-slate-500 mb-1">Total HPP per Porsi</p>
+                    <p id="display-hpp" class="text-4xl font-black text-orange-600">Rp 0</p>
+                </div>
+                <div class="space-y-3">
+                    <input type="text" placeholder="Nama Menu..." class="w-full p-3 border rounded-xl font-bold mb-2">
+                    <div id="ingredient-list" class="space-y-2">
+                        <div class="flex gap-2 items-center">
+                            <select class="flex-1 p-3 bg-slate-50 border rounded-xl text-sm outline-none border-slate-200">
+                                <option>Biji Kopi (Rp 150/gr)</option>
+                                <option>Susu UHT (Rp 18/ml)</option>
+                                <option>Gula Aren (Rp 45/ml)</option>
+                            </select>
+                            <input type="number" placeholder="Qty" class="w-20 p-3 border rounded-xl text-center font-bold" value="10">
+                            <button class="text-slate-300"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                        </div>
+                    </div>
+                    <button class="w-full py-3 border-2 border-dashed rounded-xl text-slate-400 font-bold mt-2">+ Tambah Bahan</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="promo" class="tab-content">
+            <div class="space-y-4">
+                <div class="grid grid-cols-4 gap-2">
+                    <button onclick="setPromo('diskon')" class="promo-mode p-3 bg-white border rounded-xl text-center font-bold text-[10px] border-orange-500 text-orange-600">DISKON</button>
+                    <button onclick="setPromo('bundling')" class="promo-mode p-3 bg-white border rounded-xl text-center font-bold text-[10px]">BUNDLING</button>
+                    <button onclick="setPromo('bogo')" class="promo-mode p-3 bg-white border rounded-xl text-center font-bold text-[10px]">BOGO</button>
+                    <button onclick="setPromo('tebus')" class="promo-mode p-3 bg-white border rounded-xl text-center font-bold text-[10px]">TEBUS</button>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border shadow-sm">
+                    <h3 id="promo-title" class="font-black text-slate-800 mb-4">Kalkulator Diskon</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Harga Jual Normal (Rp)</label>
+                            <input type="number" id="promo-price" value="20000" class="w-full p-3 bg-slate-50 border rounded-xl font-bold" oninput="calculatePromo()">
+                        </div>
+                        <div>
+                            <label id="promo-label" class="text-[10px] font-bold text-slate-400 uppercase">Besar Diskon (%)</label>
+                            <input type="number" id="promo-value" value="10" class="w-full p-3 bg-slate-50 border rounded-xl font-bold" oninput="calculatePromo()">
+                        </div>
+                        <div class="p-5 bg-slate-900 rounded-2xl text-white mt-6">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase">Harga Setelah Promo</p>
+                                    <p id="promo-result" class="text-2xl font-black text-orange-400">Rp 18.000</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="ai" class="tab-content">
+            <div class="space-y-4">
+                <div class="bg-white p-6 rounded-2xl border shadow-sm">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="chef-hat" class="text-orange-600"></i>
+                        <h4 class="font-black text-slate-800">Recipe Generator</h4>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">Buat resep unik dari bahan sisa/stok yang ada.</p>
+                    <input type="text" id="recipe-input" placeholder="Contoh: Matcha dan Selai Kacang" class="w-full p-3 border rounded-xl text-sm mb-3 outline-none focus:ring-2 focus:ring-orange-500">
+                    <button onclick="runAI('recipe')" id="btn-recipe" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Generate Resep AI</button>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border shadow-sm">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="trending-up" class="text-blue-600"></i>
+                        <h4 class="font-black text-slate-800">Promo Advisor</h4>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">Saran strategi marketing berdasarkan tren cafe 2024.</p>
+                    <button onclick="runAI('advisor')" id="btn-advisor" class="w-full border-2 border-blue-600 text-blue-600 py-3 rounded-xl font-bold text-sm">Cek Ide Promo</button>
+                </div>
+
+                <div id="ai-response" class="hidden bg-slate-900 text-white rounded-2xl p-6 border-l-4 border-orange-500 animate-fade">
+                    <p id="ai-text" class="text-sm leading-relaxed whitespace-pre-wrap"></p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Tab System
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active-tab-btn'));
+            
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active-tab-btn');
+            lucide.createIcons();
+        }
+
+        // Promo Logic
+        let currentMode = 'diskon';
+        function setPromo(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.promo-mode').forEach(btn => btn.classList.remove('border-orange-500', 'text-orange-600'));
+            event.target.classList.add('border-orange-500', 'text-orange-600');
+            
+            const title = document.getElementById('promo-title');
+            const label = document.getElementById('promo-label');
+            
+            if(mode === 'diskon') {
+                title.innerText = 'Kalkulator Diskon';
+                label.innerText = 'Besar Diskon (%)';
+            } else if(mode === 'bundling') {
+                title.innerText = 'Kalkulator Bundling (2 Menu)';
+                label.innerText = 'Harga Paket (Rp)';
+            } else if(mode === 'bogo') {
+                title.innerText = 'Kalkulator Buy 1 Get 1';
+                label.innerText = 'Potongan Tambahan (Rp)';
+            } else if(mode === 'tebus') {
+                title.innerText = 'Kalkulator Tebus Murah';
+                label.innerText = 'Harga Tebus (Rp)';
+            }
+            calculatePromo();
+        }
+
+        function calculatePromo() {
+            const price = parseFloat(document.getElementById('promo-price').value) || 0;
+            const val = parseFloat(document.getElementById('promo-value').value) || 0;
+            let result = 0;
+
+            if(currentMode === 'diskon') result = price - (price * (val/100));
+            else if(currentMode === 'bundling' || currentMode === 'tebus') result = val;
+            else if(currentMode === 'bogo') result = price - val;
+
+            document.getElementById('promo-result').innerText = 'Rp ' + result.toLocaleString('id-ID');
+        }
+
+        // AI Simulation
+        function runAI(type) {
+            const btn = type === 'recipe' ? document.getElementById('btn-recipe') : document.getElementById('btn-advisor');
+            const responseDiv = document.getElementById('ai-response');
+            const responseText = document.getElementById('ai-text');
+            const input = document.getElementById('recipe-input').value;
+
+            btn.innerText = 'Menganalisa...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                responseDiv.classList.remove('hidden');
+                if(type === 'recipe') {
+                    responseText.innerText = `💡 IDE RESEP: ${input || 'Signature Coffee'}\n\n1. Campurkan bahan dasar dengan rasio 1:2.\n2. Tambahkan topping foam untuk meningkatkan visual.\n3. Saran Harga: Rp 25.000 - Rp 32.000.\n4. Estimasi Margin: 65%.`;
+                } else {
+                    responseText.innerText = `📈 STRATEGI PROMO:\n\n1. Paket Sarapan: Kopi + Roti (Hemat 20%).\n2. Loyalty: Beli 5 Gratis 1 setiap hari kerja.\n3. Jam Ajaib: Diskon 15% di jam 14:00 - 16:00.`;
                 }
-            }, [name]);
-            return <i data-lucide={name} style={{ width: size, height: size }} className={`inline-block ${className}`}></i>;
+                btn.innerText = type === 'recipe' ? 'Generate Resep AI' : 'Cek Ide Promo';
+                btn.disabled = false;
+            }, 1000);
+        }
+
+        // Init
+        window.onload = () => {
+            lucide.createIcons();
         };
-
-        const App = () => {
-            const [activeTab, setActiveTab] = useState('hpp');
-            const [ingredientDb, setIngredientDb] = useState([
-                { id: 1, name: 'Biji Kopi House Blend', price: 150000, capacity: 1000, unit: 'gr' },
-                { id: 2, name: 'Susu UHT', price: 18000, capacity: 1000, unit: 'ml' },
-                { id: 3, name: 'Gula Aren Cair', price: 45000, capacity: 1000, unit: 'ml' },
-            ]);
-            const [menuItems, setMenuItems] = useState([
-                { id: 1, name: 'Es Kopi Susu Gula Aren', hpp: 8500, price: 18000 },
-                { id: 2, name: 'Croissant Butter', hpp: 12000, price: 25000 },
-            ]);
-
-            // States
-            const [ingredients, setIngredients] = useState([{ dbId: '', usage: '' }]);
-            const [hppName, setHppName] = useState('');
-            const [promoType, setPromoType] = useState('discount');
-            const [promoData, setPromoData] = useState({ itemId: '', discountPercent: 10, tebusPrice: 5000 });
-            const [aiLoading, setAiLoading] = useState(false);
-            const [aiResult, setAiResult] = useState(null);
-            const [recipeInput, setRecipeInput] = useState('');
-
-            const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
-
-            const totalHPP = useMemo(() => {
-                return ingredients.reduce((sum, row) => {
-                    const base = ingredientDb.find(db => db.id == row.dbId);
-                    if (base && row.usage) return sum + ((base.price / base.capacity) * Number(row.usage));
-                    return sum;
-                }, 0);
-            }, [ingredients, ingredientDb]);
-
-            const simulateAI = (type) => {
-                setAiLoading(true);
-                setTimeout(() => {
-                    if(type === 'recipe') {
-                        setAiResult(`💡 ANALISIS RESEP: ${recipeInput}\n\n1. Kombinasi Bahan: Gunakan rasio 1:3 untuk tekstur creamy.\n2. Inovasi: Tambahkan sedikit sea salt untuk rasa 'premium'.\n3. Estimasi HPP: Rp 11.200 per porsi.\n4. Strategi Harga: Cocok dijual seharga Rp 28.000 - Rp 32.000.`);
-                    } else {
-                        setAiResult(`📈 PROMO ADVISOR\n\n1. Paket Bundling: Pasangkan ${menuItems[0]?.name || 'Produk Utama'} dengan snack ringan.\n2. Jam Ramai: Berikan diskon 15% pada pukul 14:00 - 16:00.\n3. Flash Sale: Adakan promo "Tebus Murah" setiap hari Jumat.`);
-                    }
-                    setAiLoading(false);
-                }, 1200);
-            };
-
-            return (
-                <div className="min-h-screen pb-20">
-                    <header className="bg-white border-b sticky top-0 z-10 p-4">
-                        <div className="max-w-4xl mx-auto flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <div className="bg-orange-600 p-2 rounded-lg text-white"><Icon name="coffee" /></div>
-                                <h1 className="text-xl font-extrabold text-slate-800">CafeProfit Master</h1>
-                            </div>
-                        </div>
-                    </header>
-
-                    <main className="max-w-4xl mx-auto p-4 space-y-4">
-                        {/* Tab Navigation */}
-                        <div className="flex bg-white p-1 rounded-xl shadow-sm border overflow-x-auto no-scrollbar gap-1">
-                            {[
-                                { id: 'hpp', icon: 'calculator', label: 'HPP' },
-                                { id: 'promo', icon: 'tag', label: 'Promo' },
-                                { id: 'ai', icon: 'sparkles', label: 'AI Biz' },
-                                { id: 'menu', icon: 'book-open', label: 'Menu' },
-                                { id: 'db', icon: 'database', label: 'Bahan' },
-                            ].map((tab) => (
-                                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all flex-1 justify-center ${activeTab === tab.id ? 'bg-orange-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-50'}`}>
-                                    <Icon name={tab.icon} size={14} /> {tab.label}
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* CONTENT: HPP */}
-                        {activeTab === 'hpp' && (
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border animate-fade">
-                                <h2 className="text-sm font-black text-slate-400 uppercase mb-4">Kalkulator HPP</h2>
-                                <div className="mb-6 bg-slate-50 p-4 rounded-xl text-center">
-                                    <p className="text-xs font-bold text-slate-500">Total HPP per Porsi</p>
-                                    <p className="text-4xl font-black text-orange-600">{formatIDR(totalHPP)}</p>
-                                </div>
-                                <input type="text" placeholder="Nama Menu (Contoh: Latte)" className="w-full p-3 border rounded-xl mb-4 font-bold outline-none focus:ring-2 focus:ring-orange-500" value={hppName} onChange={(e) => setHppName(e.target.value)} />
-                                <div className="space-y-3">
-                                    {ingredients.map((row, idx) => (
-                                        <div key={idx} className="flex gap-2 items-center">
-                                            <select className="flex-1 p-3 bg-slate-50 border rounded-xl text-sm" value={row.dbId} onChange={(e) => {
-                                                const n = [...ingredients]; n[idx].dbId = e.target.value; setIngredients(n);
-                                            }}>
-                                                <option value="">Pilih Bahan</option>
-                                                {ingredientDb.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
-                                            </select>
-                                            <input type="number" placeholder="Qty" className="w-24 p-3 border rounded-xl text-center font-bold" value={row.usage} onChange={(e) => {
-                                                const n = [...ingredients]; n[idx].usage = e.target.value; setIngredients(n);
-                                            }} />
-                                            <button onClick={() => setIngredients(ingredients.filter((_, i) => i !== idx))} className="text-slate-300 hover:text-red-500"><Icon name="trash-2" /></button>
-                                        </div>
-                                    ))}
-                                    <button onClick={() => setIngredients([...ingredients, { dbId: '', usage: '' }])} className="w-full py-3 border-2 border-dashed rounded-xl text-slate-400 font-bold hover:bg-orange-50 hover:border-orange-200 transition-all">+ Bahan</button>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* CONTENT: PROMO */}
-                        {activeTab === 'promo' && (
-                            <div className="space-y-4 animate-fade">
-                                <div className="grid grid-cols-4 gap-2">
-                                    {[
-                                        { id: 'discount', label: 'Diskon', icon: 'percent' },
-                                        { id: 'bundling', label: 'Bundel', icon: 'package' },
-                                        { id: 'bogo', label: 'BOGO', icon: 'gift' },
-                                        { id: 'tebus', label: 'Tebus', icon: 'shopping-cart' }
-                                    ].map(p => (
-                                        <button key={p.id} onClick={() => setPromoType(p.id)} className={`p-3 rounded-xl border text-center transition-all ${promoType === p.id ? 'bg-orange-600 text-white' : 'bg-white text-slate-600'}`}>
-                                            <Icon name={p.icon} className="mb-1" />
-                                            <p className="text-[10px] font-bold">{p.label}</p>
-                                        </button>
-                                    ))}
-                                </div>
-                                <div className="bg-white p-6 rounded-2xl border shadow-sm">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Produk Target</label>
-                                    <select className="w-full p-3 bg-slate-50 border rounded-xl font-bold mb-4 mt-1" value={promoData.itemId} onChange={(e) => setPromoData({...promoData, itemId: e.target.value})}>
-                                        <option value="">-- Pilih Menu --</option>
-                                        {menuItems.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                                    </select>
-                                    
-                                    {promoType === 'discount' && (
-                                        <input type="number" placeholder="Masukkan % Diskon" className="w-full p-3 border rounded-xl font-bold" value={promoData.discountPercent} onChange={(e) => setPromoData({...promoData, discountPercent: e.target.value})} />
-                                    )}
-                                    {promoType === 'tebus' && (
-                                        <input type="number" placeholder="Harga Tebus Murah (Rp)" className="w-full p-3 border rounded-xl font-bold" value={promoData.tebusPrice} onChange={(e) => setPromoData({...promoData, tebusPrice: e.target.value})} />
-                                    )}
-
-                                    {promoData.itemId && (
-                                        <div className="mt-6 p-5 bg-slate-900 rounded-2xl text-white">
-                                            {(() => {
-                                                const item = menuItems.find(m => m.id == promoData.itemId);
-                                                if(!item) return null;
-                                                let sell = item.price;
-                                                let cost = item.hpp;
-                                                if(promoType === 'discount') sell = item.price * (1 - promoData.discountPercent/100);
-                                                if(promoType === 'bogo') cost = item.hpp * 2;
-                                                if(promoType === 'tebus') sell = parseInt(promoData.tebusPrice);
-                                                
-                                                const profit = sell - cost;
-                                                return (
-                                                    <div className="flex justify-between items-center">
-                                                        <div>
-                                                            <p className="text-[10px] text-slate-400 uppercase font-bold">Profit Per Promo</p>
-                                                            <p className="text-2xl font-black text-orange-400">{formatIDR(profit)}</p>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <p className="text-[10px] text-slate-400 uppercase font-bold">Margin</p>
-                                                            <p className={`text-lg font-bold ${profit > 0 ? 'text-green-400' : 'text-red-400'}`}>{((profit/sell)*100).toFixed(1)}%</p>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })()}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* CONTENT: AI BUSINESS */}
-                        {activeTab === 'ai' && (
-                            <div className="space-y-4 animate-fade">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="bg-white p-6 rounded-2xl border shadow-sm">
-                                        <h4 className="font-black text-slate-800 flex items-center gap-2"><Icon name="chef-hat" className="text-orange-600"/> Recipe Generator</h4>
-                                        <p className="text-xs text-slate-500 mt-1 mb-4">Input bahan utama untuk ide menu baru.</p>
-                                        <input type="text" placeholder="Bahan: Matcha, Oatmilk..." className="w-full p-3 border rounded-xl text-sm mb-3" value={recipeInput} onChange={(e) => setRecipeInput(e.target.value)} />
-                                        <button onClick={() => simulateAI('recipe')} className="w-full bg-orange-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-orange-100">
-                                            {aiLoading ? 'Memproses...' : 'Dapatkan Resep AI'}
-                                        </button>
-                                    </div>
-                                    <div className="bg-white p-6 rounded-2xl border shadow-sm">
-                                        <h4 className="font-black text-slate-800 flex items-center gap-2"><Icon name="trending-up" className="text-blue-600"/> Promo Advisor</h4>
-                                        <p className="text-xs text-slate-500 mt-1 mb-4">Analisis strategi promo paling efisien.</p>
-                                        <button onClick={() => simulateAI('advisor')} className="w-full border-2 border-blue-600 text-blue-600 py-3 rounded-xl font-bold text-sm">
-                                            {aiLoading ? 'Menganalisa...' : 'Cek Ide Promo'}
-                                        </button>
-                                    </div>
-                                </div>
-                                {aiResult && (
-                                    <div className="bg-slate-900 text-white rounded-2xl p-6 border-l-4 border-orange-500">
-                                        <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                            {aiResult}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* CONTENT: MENU & DB (Simplified) */}
-                        {activeTab === 'menu' && (
-                            <div className="bg-white rounded-2xl shadow-sm border overflow-hidden animate-fade">
-                                <div className="p-4 bg-slate-50 border-b font-bold text-slate-400
+    </script>
+</body>
+</html>
