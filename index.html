@@ -5,55 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CafeProfit Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
 </head>
-<body class="bg-slate-50">
+<body class="bg-gray-100">
     <div id="root"></div>
 
     <script type="text/babel">
-        // Inisialisasi Ikon Lucide untuk React
-        const { 
-          Calculator, Tag, BookOpen, Sparkles, Plus, Trash2, Percent, 
-          Package, Gift, ShoppingCart, ChefHat, TrendingUp, AlertCircle, 
-          Loader2, Database, Settings, ClipboardList, X, CheckCircle2, 
-          Edit3, Save 
-        } = lucide;
-
-        const { useState, useEffect, useMemo } = React;
+        // Mengambil fungsi dari React
+        const { useState, useMemo, useEffect } = React;
 
         const App = () => {
             const [activeTab, setActiveTab] = useState('hpp');
-            const [editingId, setEditingId] = useState(null);
-            
-            // Database Bahan
             const [ingredientDb, setIngredientDb] = useState([
-                { id: 1, name: 'Biji Kopi House Blend', price: 150000, capacity: 1000, unit: 'gr' },
-                { id: 2, name: 'Susu UHT', price: 18000, capacity: 1000, unit: 'ml' },
-                { id: 3, name: 'Gula Aren Cair', price: 45000, capacity: 1000, unit: 'ml' },
+                { id: 1, name: 'Kopi Blend', price: 150000, capacity: 1000 },
+                { id: 2, name: 'Susu UHT', price: 18000, capacity: 1000 },
             ]);
-
-            // Menu List
-            const [menuItems, setMenuItems] = useState([
-                { id: 1, name: 'Es Kopi Susu Gula Aren', hpp: 8500, price: 18000 },
-            ]);
-
-            // Calculator State
             const [ingredients, setIngredients] = useState([{ dbId: '', usage: '' }]);
             const [hppName, setHppName] = useState('');
+            const [menuItems, setMenuItems] = useState([]);
 
             const formatIDR = (val) => new Intl.NumberFormat('id-ID', { 
-                style: 'currency', 
-                currency: 'IDR', 
-                maximumFractionDigits: 0 
+                style: 'currency', currency: 'IDR', maximumFractionDigits: 0 
             }).format(val);
 
-            // Logika HPP
             const totalHPP = useMemo(() => {
                 return ingredients.reduce((sum, row) => {
                     const base = ingredientDb.find(db => db.id == row.dbId);
@@ -64,132 +41,79 @@
                 }, 0);
             }, [ingredients, ingredientDb]);
 
-            const addIngredientRow = () => setIngredients([...ingredients, { dbId: '', usage: '' }]);
-            
-            const updateIngredientRow = (index, field, value) => {
-                const newIng = [...ingredients];
-                newIng[index][field] = value;
-                setIngredients(newIng);
-            };
-
-            const saveToMenu = () => {
-                if (!hppName || totalHPP === 0) return;
-                setMenuItems([...menuItems, { 
-                    id: Date.now(), 
-                    name: hppName, 
-                    hpp: totalHPP, 
-                    price: Math.ceil((totalHPP * 3) / 1000) * 1000 
-                }]);
-                setHppName('');
-                setIngredients([{ dbId: '', usage: '' }]);
-                setActiveTab('menu');
-            };
+            // Pastikan ikon muncul setelah render
+            useEffect(() => {
+                lucide.createIcons();
+            }, [activeTab]);
 
             return (
-                <div className="min-h-screen pb-20">
-                    <header className="bg-white border-b p-4 sticky top-0 z-10 shadow-sm">
-                        <div className="max-w-4xl mx-auto flex items-center gap-3">
-                            <div className="bg-orange-600 p-2 rounded-lg text-white">
-                                <Calculator size={24} />
-                            </div>
-                            <h1 className="text-xl font-bold text-slate-800">CafeProfit Master</h1>
-                        </div>
+                <div className="min-h-screen font-sans">
+                    <header className="bg-orange-600 p-4 text-white shadow-lg text-center">
+                        <h1 className="text-2xl font-bold">☕ CafeProfit Master</h1>
                     </header>
 
-                    <main className="max-w-4xl mx-auto p-4 space-y-6">
-                        {/* Navigasi */}
-                        <div className="flex bg-white p-1 rounded-xl shadow-sm border overflow-x-auto">
-                            <button onClick={() => setActiveTab('hpp')} className={`flex-1 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 ${activeTab === 'hpp' ? 'bg-orange-600 text-white' : 'text-slate-600'}`}>
-                                <Calculator size={16} /> HPP
-                            </button>
-                            <button onClick={() => setActiveTab('menu')} className={`flex-1 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 ${activeTab === 'menu' ? 'bg-orange-600 text-white' : 'text-slate-600'}`}>
-                                <BookOpen size={16} /> Menu
-                            </button>
-                            <button onClick={() => setActiveTab('db')} className={`flex-1 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 ${activeTab === 'db' ? 'bg-orange-600 text-white' : 'text-slate-600'}`}>
-                                <Database size={16} /> Database
-                            </button>
-                        </div>
+                    <nav className="flex bg-white border-b sticky top-0">
+                        <button onClick={() => setActiveTab('hpp')} className={`flex-1 p-3 font-bold ${activeTab === 'hpp' ? 'text-orange-600 border-b-2 border-orange-600' : 'text-gray-400'}`}>HITUNG HPP</button>
+                        <button onClick={() => setActiveTab('menu')} className={`flex-1 p-3 font-bold ${activeTab === 'menu' ? 'text-orange-600 border-b-2 border-orange-600' : 'text-gray-400'}`}>DAFTAR MENU</button>
+                    </nav>
 
+                    <main className="p-4 max-w-md mx-auto">
                         {activeTab === 'hpp' && (
-                            <div className="bg-white rounded-2xl p-6 shadow-md border animate-in fade-in">
-                                <h2 className="text-lg font-bold mb-4">Kalkulator HPP</h2>
-                                <input 
-                                    className="w-full p-4 bg-slate-50 border rounded-xl mb-6 font-bold outline-none focus:ring-2 focus:ring-orange-500" 
-                                    placeholder="Nama Menu Baru..." 
-                                    value={hppName} 
-                                    onChange={(e) => setHppName(e.target.value)}
-                                />
+                            <div className="bg-white p-6 rounded-xl shadow-md">
+                                <label className="block text-xs font-bold text-gray-400 mb-1">NAMA MENU</label>
+                                <input className="w-full p-3 border rounded-lg mb-4" placeholder="Es Kopi Susu..." value={hppName} onChange={(e) => setHppName(e.target.value)} />
+                                
                                 <div className="space-y-3">
                                     {ingredients.map((row, idx) => (
                                         <div key={idx} className="flex gap-2">
-                                            <select 
-                                                className="flex-1 p-3 border rounded-xl bg-white"
-                                                value={row.dbId}
-                                                onChange={(e) => updateIngredientRow(idx, 'dbId', e.target.value)}
-                                            >
+                                            <select className="flex-1 p-2 border rounded-lg text-sm" value={row.dbId} onChange={(e) => {
+                                                const newIng = [...ingredients];
+                                                newIng[idx].dbId = e.target.value;
+                                                setIngredients(newIng);
+                                            }}>
                                                 <option value="">Pilih Bahan</option>
                                                 {ingredientDb.map(db => <option key={db.id} value={db.id}>{db.name}</option>)}
                                             </select>
-                                            <input 
-                                                type="number" 
-                                                className="w-24 p-3 border rounded-xl" 
-                                                placeholder="Qty"
-                                                value={row.usage}
-                                                onChange={(e) => updateIngredientRow(idx, 'usage', e.target.value)}
-                                            />
-                                            <button onClick={() => setIngredients(ingredients.filter((_, i) => i !== idx))} className="text-red-400 p-2">
-                                                <Trash2 size={20} />
-                                            </button>
+                                            <input type="number" className="w-20 p-2 border rounded-lg text-sm" placeholder="Gram/Ml" value={row.usage} onChange={(e) => {
+                                                const newIng = [...ingredients];
+                                                newIng[idx].usage = e.target.value;
+                                                setIngredients(newIng);
+                                            }} />
                                         </div>
                                     ))}
                                 </div>
-                                <button onClick={addIngredientRow} className="w-full py-3 border-2 border-dashed rounded-xl text-slate-400 mt-4 hover:bg-slate-50 transition-all">+ Tambah Komponen</button>
-                                
-                                <div className="mt-8 p-6 bg-orange-600 rounded-2xl text-white text-center shadow-lg shadow-orange-100">
-                                    <p className="text-xs uppercase font-black opacity-80">Estimasi HPP Per Porsi</p>
-                                    <p className="text-4xl font-black">{formatIDR(totalHPP)}</p>
+
+                                <button onClick={() => setIngredients([...ingredients, {dbId: '', usage: ''}])} className="w-full mt-4 py-2 border-2 border-dashed border-gray-200 text-gray-400 rounded-lg">+ Tambah Bahan</button>
+
+                                <div className="mt-6 p-4 bg-orange-100 rounded-lg text-center">
+                                    <p className="text-xs font-bold text-orange-800">TOTAL HPP</p>
+                                    <p className="text-2xl font-black text-orange-600">{formatIDR(totalHPP)}</p>
                                 </div>
 
                                 <button 
-                                    onClick={saveToMenu}
-                                    disabled={!hppName || totalHPP === 0}
-                                    className="w-full bg-slate-900 text-white py-4 rounded-xl mt-6 font-bold disabled:opacity-30 flex items-center justify-center gap-2"
+                                    onClick={() => {
+                                        setMenuItems([...menuItems, {name: hppName, hpp: totalHPP}]);
+                                        setHppName('');
+                                        setIngredients([{dbId: '', usage: ''}]);
+                                        setActiveTab('menu');
+                                    }}
+                                    disabled={!hppName}
+                                    className="w-full bg-orange-600 text-white font-bold py-3 rounded-lg mt-4 disabled:bg-gray-300"
                                 >
-                                    <Save size={18} /> Simpan ke Daftar Menu
+                                    SIMPAN KE MENU
                                 </button>
                             </div>
                         )}
 
                         {activeTab === 'menu' && (
-                            <div className="bg-white rounded-2xl shadow-sm border divide-y">
-                                <div className="p-4 bg-slate-50 font-bold text-slate-700">Daftar Jual Menu</div>
-                                {menuItems.map(item => (
-                                    <div key={item.id} className="p-5 flex justify-between items-center hover:bg-orange-50/30 transition-all">
-                                        <div>
-                                            <p className="font-black text-slate-800 text-lg">{item.name}</p>
-                                            <p className="text-sm text-slate-500 font-medium">HPP: {formatIDR(item.hpp)} | Jual: {formatIDR(item.price)}</p>
-                                        </div>
-                                        <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-black uppercase">Profit OK</div>
+                            <div className="space-y-3">
+                                {menuItems.length === 0 && <p className="text-center text-gray-400 mt-10">Belum ada menu tersimpan.</p>}
+                                {menuItems.map((item, i) => (
+                                    <div key={i} className="bg-white p-4 rounded-lg shadow border-l-4 border-orange-500">
+                                        <p className="font-bold text-gray-800">{item.name}</p>
+                                        <p className="text-orange-600 font-bold">{formatIDR(item.hpp)}</p>
                                     </div>
                                 ))}
-                            </div>
-                        )}
-
-                        {activeTab === 'db' && (
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="font-bold text-slate-800">Database Harga Bahan</h2>
-                                    <button onClick={() => setIngredientDb([...ingredientDb, { id: Date.now(), name: '', price: 0, capacity: 1000, unit: 'gr' }])} className="bg-orange-600 text-white px-4 py-2 rounded-xl text-sm font-bold">+ Bahan</button>
-                                </div>
-                                <div className="space-y-3">
-                                    {ingredientDb.map(item => (
-                                        <div key={item.id} className="grid grid-cols-12 gap-2 items-center">
-                                            <input className="col-span-6 p-2 border rounded-lg" placeholder="Nama Bahan" value={item.name} onChange={(e) => setIngredientDb(ingredientDb.map(i => i.id === item.id ? {...i, name: e.target.value} : i))} />
-                                            <input type="number" className="col-span-4 p-2 border rounded-lg" placeholder="Harga" value={item.price} onChange={(e) => setIngredientDb(ingredientDb.map(i => i.id === item.id ? {...i, price: e.target.value} : i))} />
-                                            <button onClick={() => setIngredientDb(ingredientDb.filter(i => i.id !== item.id))} className="col-span-2 text-red-400 flex justify-center"><Trash2 size={18}/></button>
-                                        </div>
-                                    ))}
-                                </div>
                             </div>
                         )}
                     </main>
