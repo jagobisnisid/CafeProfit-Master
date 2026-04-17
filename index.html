@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CafeProfit Master | Full Suite</title>
+    <title>CafeProfit Master | Pro Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -13,6 +13,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .animate-fade { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-slate-50">
@@ -21,46 +23,43 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
         
-        // Mock Lucide Icons for HTML Version
         const Icon = ({ name, size = 20, className = "" }) => {
             return <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
         };
 
         const App = () => {
             const [activeTab, setActiveTab] = useState('hpp');
-            const [showBulkModal, setShowBulkModal] = useState(false);
-            const [bulkInputText, setBulkInputText] = useState('');
-            const [editingId, setEditingId] = useState(null);
-            
             const [ingredientDb, setIngredientDb] = useState([
                 { id: 1, name: 'Biji Kopi House Blend', price: 150000, capacity: 1000, unit: 'gr' },
                 { id: 2, name: 'Susu UHT', price: 18000, capacity: 1000, unit: 'ml' },
                 { id: 3, name: 'Gula Aren Cair', price: 45000, capacity: 1000, unit: 'ml' },
             ]);
-
             const [menuItems, setMenuItems] = useState([
                 { id: 1, name: 'Es Kopi Susu Gula Aren', hpp: 8500, price: 18000 },
                 { id: 2, name: 'Croissant Butter', hpp: 12000, price: 25000 },
             ]);
 
+            // HPP State
             const [ingredients, setIngredients] = useState([{ dbId: '', usage: '' }]);
             const [hppName, setHppName] = useState('');
+
+            // Promo State
             const [promoType, setPromoType] = useState('discount');
-            const [promoData, setPromoData] = useState({ itemId: '', discountPercent: 10 });
+            const [promoData, setPromoData] = useState({ itemId: '', discountPercent: 10, tebusPrice: 5000 });
+
+            // AI State
             const [aiLoading, setAiLoading] = useState(false);
             const [aiResult, setAiResult] = useState(null);
             const [recipeInput, setRecipeInput] = useState('');
 
-            useEffect(() => { lucide.createIcons(); }, [activeTab, showBulkModal, editingId, aiResult, ingredients]);
+            useEffect(() => { lucide.createIcons(); }, [activeTab, aiResult, ingredients, promoType, promoData]);
 
             const formatIDR = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
 
             const totalHPP = useMemo(() => {
                 return ingredients.reduce((sum, row) => {
                     const base = ingredientDb.find(db => db.id == row.dbId);
-                    if (base && row.usage) {
-                        return sum + ((base.price / base.capacity) * Number(row.usage));
-                    }
+                    if (base && row.usage) return sum + ((base.price / base.capacity) * Number(row.usage));
                     return sum;
                 }, 0);
             }, [ingredients, ingredientDb]);
@@ -68,9 +67,16 @@
             const saveToMenu = () => {
                 if (!hppName) return;
                 setMenuItems([...menuItems, { id: Date.now(), name: hppName, hpp: totalHPP, price: Math.ceil((totalHPP * 3) / 1000) * 1000 }]);
-                setHppName('');
-                setIngredients([{ dbId: '', usage: '' }]);
-                setActiveTab('menu');
+                setHppName(''); setIngredients([{ dbId: '', usage: '' }]); setActiveTab('menu');
+            };
+
+            const simulateAI = (type) => {
+                setAiLoading(true);
+                setTimeout(() => {
+                    if(type === 'recipe') setAiResult(`### Hasil AI Recipe: ${recipeInput}\n\n1. Gunakan perbandingan 1:2 untuk rasa optimal.\n2. Tambahkan foam di atas untuk meningkatkan nilai jual.\n3. Estimasi HPP baru: Rp 12.500.\n4. Saran Harga Jual: Rp 35.000.`);
+                    else setAiResult(`### Strategi Promo Advisor\n\n1. **Bundling Maut**: Gabungkan ${menuItems[0]?.name || 'Menu A'} dengan snack.\n2. **Happy Hour**: Diskon 20% pada jam 14.00-16.00.\n3. **Loyalty Program**: Beli 5 gratis 1 menggunakan stamp kartu.`);
+                    setAiLoading(false);
+                }, 1500);
             };
 
             return (
@@ -78,9 +84,7 @@
                     <header className="bg-white border-b sticky top-0 z-10 shadow-sm">
                         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <div className="bg-orange-600 p-2 rounded-lg text-white">
-                                    <Icon name="calculator" />
-                                </div>
+                                <div className="bg-orange-600 p-2 rounded-lg text-white"><Icon name="coffee" /></div>
                                 <h1 className="text-xl font-bold tracking-tight text-slate-800">CafeProfit Master</h1>
                             </div>
                             <button onClick={() => setActiveTab('db')} className={`p-2 rounded-full ${activeTab === 'db' ? 'bg-orange-100 text-orange-600' : 'text-slate-400'}`}>
@@ -92,118 +96,119 @@
                     <main className="max-w-4xl mx-auto p-4 space-y-6">
                         <div className="flex bg-white p-1 rounded-xl shadow-sm border overflow-x-auto no-scrollbar gap-1">
                             {[
-                                { id: 'hpp', icon: 'calculator', label: 'Kalkulator HPP' },
+                                { id: 'hpp', icon: 'calculator', label: 'HPP' },
                                 { id: 'promo', icon: 'tag', label: 'Promo' },
                                 { id: 'menu', icon: 'book-open', label: 'Menu' },
                                 { id: 'ai', icon: 'sparkles', label: 'AI Business' },
                                 { id: 'db', icon: 'database', label: 'Database' },
                             ].map((tab) => (
-                                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap flex-1 justify-center ${activeTab === tab.id ? 'bg-orange-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'}`}>
+                                <button key={tab.id} onClick={() => {setActiveTab(tab.id); setAiResult(null);}} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all flex-1 justify-center ${activeTab === tab.id ? 'bg-orange-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'}`}>
                                     <Icon name={tab.icon} size={16} /> {tab.label}
                                 </button>
                             ))}
                         </div>
 
+                        {/* TAB HPP */}
                         {activeTab === 'hpp' && (
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border animate-in slide-in-from-bottom-2">
+                            <div className="bg-white rounded-2xl p-6 shadow-sm border animate-fade">
                                 <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-lg font-bold uppercase tracking-tight text-slate-400">Kalkulator HPP</h2>
+                                    <h2 className="text-lg font-bold text-slate-400 uppercase">Kalkulator HPP</h2>
                                     <div className="text-right">
-                                        <p className="text-xs text-slate-500 uppercase font-bold">Total Biaya/Porsi</p>
                                         <p className="text-3xl font-black text-orange-600">{formatIDR(totalHPP)}</p>
                                     </div>
                                 </div>
-                                <div className="space-y-4">
-                                    <input type="text" placeholder="Nama Menu (Contoh: Kopi Susu Creamy)" className="w-full p-4 bg-slate-50 border rounded-xl font-bold outline-none focus:ring-2 focus:ring-orange-500" value={hppName} onChange={(e) => setHppName(e.target.value)} />
-                                    <div className="space-y-3">
-                                        {ingredients.map((row, idx) => (
-                                            <div key={idx} className="flex gap-2 items-center bg-slate-50 p-2 rounded-xl border group">
-                                                <select className="flex-[2] bg-white border rounded-lg p-2.5 text-sm" value={row.dbId} onChange={(e) => {
-                                                    const newIng = [...ingredients];
-                                                    newIng[idx].dbId = e.target.value;
-                                                    setIngredients(newIng);
-                                                }}>
-                                                    <option value="">-- Pilih Bahan --</option>
-                                                    {ingredientDb.map(db => <option key={db.id} value={db.id}>{db.name}</option>)}
-                                                </select>
-                                                <input type="number" placeholder="Qty" className="flex-1 p-2.5 text-sm font-bold border rounded-lg" value={row.usage} onChange={(e) => {
-                                                    const newIng = [...ingredients];
-                                                    newIng[idx].usage = e.target.value;
-                                                    setIngredients(newIng);
-                                                }} />
-                                                <button onClick={() => setIngredients(ingredients.filter((_, i) => i !== idx))} className="text-slate-300 hover:text-red-500"><Icon name="trash-2" /></button>
-                                            </div>
-                                        ))}
-                                        <button onClick={() => setIngredients([...ingredients, { dbId: '', usage: '' }])} className="w-full py-3 border-2 border-dashed rounded-xl text-slate-400 font-bold hover:bg-slate-50">+ Tambah Bahan</button>
-                                    </div>
-                                    <button onClick={saveToMenu} disabled={!hppName || totalHPP === 0} className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold shadow-xl flex items-center justify-center gap-2 disabled:opacity-30 mt-6 uppercase tracking-wider">
-                                        <Icon name="save" size={18} /> Simpan Ke Menu
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'menu' && (
-                            <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                                <div className="p-5 border-b bg-slate-50 flex justify-between items-center">
-                                    <h3 className="font-bold text-slate-800 uppercase text-sm tracking-widest text-slate-400">Inventory Menu</h3>
-                                    <span className="bg-orange-600 text-white text-[10px] font-black px-3 py-1 rounded-full">{menuItems.length} ITEM</span>
-                                </div>
-                                <div className="divide-y">
-                                    {menuItems.map(item => (
-                                        <div key={item.id} className="p-5 flex justify-between items-center hover:bg-slate-50">
-                                            <div>
-                                                <p className="font-black text-slate-800 text-lg">{item.name}</p>
-                                                <div className="flex gap-4 text-xs mt-1 text-slate-500 font-bold">
-                                                    <span>HPP: {formatIDR(item.hpp)}</span>
-                                                    <span className="text-orange-600">JUAL: {formatIDR(item.price)}</span>
-                                                </div>
-                                            </div>
-                                            <button onClick={() => setMenuItems(menuItems.filter(m => m.id !== item.id))} className="text-slate-300 hover:text-red-500"><Icon name="trash-2" /></button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'db' && (
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-lg font-bold text-slate-800 uppercase tracking-widest text-slate-400">Database Bahan</h2>
-                                    <button onClick={() => setIngredientDb([...ingredientDb, { id: Date.now(), name: 'Bahan Baru', price: 0, capacity: 1000, unit: 'gr' }])} className="bg-orange-600 text-white px-4 py-2 rounded-lg font-bold text-sm">+ Tambah</button>
-                                </div>
+                                <input type="text" placeholder="Nama Menu..." className="w-full p-4 bg-slate-50 border rounded-xl font-bold mb-4 outline-none focus:ring-2 focus:ring-orange-500" value={hppName} onChange={(e) => setHppName(e.target.value)} />
                                 <div className="space-y-3">
-                                    {ingredientDb.map(item => (
-                                        <div key={item.id} className="flex gap-2 items-center bg-slate-50 p-3 rounded-xl border">
-                                            <input className="flex-1 bg-transparent font-bold text-sm outline-none" value={item.name} onChange={(e) => {
-                                                setIngredientDb(ingredientDb.map(i => i.id === item.id ? {...i, name: e.target.value} : i))
+                                    {ingredients.map((row, idx) => (
+                                        <div key={idx} className="flex gap-2 bg-slate-50 p-2 rounded-xl border">
+                                            <select className="flex-[2] bg-white border rounded-lg p-2 text-sm outline-none" value={row.dbId} onChange={(e) => {
+                                                const newIng = [...ingredients]; newIng[idx].dbId = e.target.value; setIngredients(newIng);
+                                            }}>
+                                                <option value="">-- Pilih Bahan --</option>
+                                                {ingredientDb.map(db => <option key={db.id} value={db.id}>{db.name}</option>)}
+                                            </select>
+                                            <input type="number" placeholder="Qty" className="flex-1 p-2 text-sm font-bold border rounded-lg outline-none" value={row.usage} onChange={(e) => {
+                                                const newIng = [...ingredients]; newIng[idx].usage = e.target.value; setIngredients(newIng);
                                             }} />
-                                            <input type="number" className="w-24 bg-white border p-1 rounded font-bold text-orange-600" value={item.price} onChange={(e) => {
-                                                setIngredientDb(ingredientDb.map(i => i.id === item.id ? {...i, price: e.target.value} : i))
-                                            }} />
-                                            <button onClick={() => setIngredientDb(ingredientDb.filter(i => i.id !== item.id))} className="text-red-300"><Icon name="x" size={16}/></button>
+                                            <button onClick={() => setIngredients(ingredients.filter((_, i) => i !== idx))} className="text-slate-300 hover:text-red-500"><Icon name="trash-2" /></button>
                                         </div>
                                     ))}
+                                    <button onClick={() => setIngredients([...ingredients, { dbId: '', usage: '' }])} className="w-full py-3 border-2 border-dashed rounded-xl text-slate-400 font-bold hover:bg-slate-50">+ Tambah Bahan</button>
+                                    <button onClick={saveToMenu} disabled={!hppName || totalHPP === 0} className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold shadow-xl mt-4">SIMPAN KE MENU</button>
                                 </div>
                             </div>
                         )}
-                        
-                        {/* Tab Promo & AI (Placeholder untuk kestabilan) */}
-                        {(activeTab === 'promo' || activeTab === 'ai') && (
-                            <div className="text-center py-20 bg-white rounded-3xl border border-dashed">
-                                <Icon name="sparkles" size={48} className="mx-auto text-slate-200 mb-4" />
-                                <p className="text-slate-400 font-bold">Fitur AI & Promo Advisor Aktif</p>
-                                <p className="text-xs text-slate-300 mt-2">Versi Stabil Cloud Aktif</p>
+
+                        {/* TAB PROMO */}
+                        {activeTab === 'promo' && (
+                            <div className="space-y-6 animate-fade">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    {[
+                                        { id: 'discount', icon: 'percent', label: 'Diskon' },
+                                        { id: 'bundling', icon: 'package', label: 'Bundling' },
+                                        { id: 'bogo', icon: 'gift', label: 'BOGO' },
+                                        { id: 'tebus', icon: 'shopping-cart', label: 'Tebus Murah' }
+                                    ].map(p => (
+                                        <button key={p.id} onClick={() => setPromoType(p.id)} className={`p-4 rounded-2xl border text-center transition-all ${promoType === p.id ? 'bg-orange-600 text-white border-orange-600 shadow-lg' : 'bg-white text-slate-600 border-slate-200'}`}>
+                                            <Icon name={p.icon} className="mx-auto mb-2" />
+                                            <span className="text-[10px] font-black uppercase tracking-widest">{p.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Pilih Produk Menu</label>
+                                    <select className="w-full p-4 bg-slate-50 border rounded-xl font-bold mb-4 outline-none" value={promoData.itemId} onChange={(e) => setPromoData({...promoData, itemId: e.target.value})}>
+                                        <option value="">-- Pilih Menu Inventory --</option>
+                                        {menuItems.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                                    </select>
+                                    
+                                    {promoType === 'discount' && (
+                                        <input type="number" placeholder="Diskon (%)" className="w-full p-4 bg-slate-50 border rounded-xl font-bold outline-none" value={promoData.discountPercent} onChange={(e) => setPromoData({...promoData, discountPercent: e.target.value})} />
+                                    )}
+                                    {promoType === 'tebus' && (
+                                        <input type="number" placeholder="Harga Tebus (Rp)" className="w-full p-4 bg-slate-50 border rounded-xl font-bold outline-none" value={promoData.tebusPrice} onChange={(e) => setPromoData({...promoData, tebusPrice: e.target.value})} />
+                                    )}
+
+                                    {promoData.itemId && (
+                                        <div className="mt-6 p-6 bg-slate-900 rounded-2xl text-white">
+                                            {(() => {
+                                                const item = menuItems.find(m => m.id == promoData.itemId);
+                                                let finalPrice = item.price;
+                                                let finalHpp = item.hpp;
+                                                if(promoType === 'discount') finalPrice = item.price * (1 - promoData.discountPercent/100);
+                                                if(promoType === 'bogo') finalHpp = item.hpp * 2;
+                                                if(promoType === 'tebus') finalPrice = parseInt(promoData.tebusPrice);
+                                                
+                                                const profit = finalPrice - finalHpp;
+                                                return (
+                                                    <div className="flex justify-between items-center">
+                                                        <div>
+                                                            <p className="text-[10px] text-slate-400 font-bold uppercase">Profit Per Promo</p>
+                                                            <p className="text-3xl font-black text-orange-400">{formatIDR(profit)}</p>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <p className="text-[10px] text-slate-400 font-bold uppercase">Margin</p>
+                                                            <p className="text-xl font-bold text-green-400">{((profit/finalPrice)*100).toFixed(1)}%</p>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })()}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         )}
 
-                    </main>
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+                        {/* TAB AI BUSINESS */}
+                        {activeTab === 'ai' && (
+                            <div className="space-y-6 animate-fade">
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div className="bg-white p-6 rounded-3xl border shadow-sm">
+                                        <Icon name="chef-hat" className="text-orange-600 mb-4" size={32} />
+                                        <h4 className="font-black text-lg">Recipe Generator</h4>
+                                        <p className="text-xs text-slate-500 mb-4">Buat resep unik dari bahan yang tersedia.</p>
+                                        <input type="text" placeholder="Bahan Utama (Kopi, Susu...)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm mb-3 outline-none" value={recipeInput} onChange={(e) => setRecipeInput(e.target.value)} />
+                                        <button onClick={() => simulateAI('recipe')} className="w-full bg-orange-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-orange-100">
+                                            {aiLoading ? 'Menganalisa...' : 'Generate Resep'}
+                                        </button>
+                                    </div>
